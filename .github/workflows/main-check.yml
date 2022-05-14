@@ -9,4 +9,4 @@ jobs:
           pip install poetry
           pip install pytest
           make lint
-          make test
+          python -m pytest
