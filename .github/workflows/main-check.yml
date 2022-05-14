@@ -4,7 +4,11 @@ jobs:
   main-checks:
     runs-on: ubuntu-latest
     steps:
-      - name: lint-project
-        run: 
+      - name: Install Poetry
+        run:
           pip install poetry
+      - name: Run linter
+        run: 
           make lint
+      - name: Run Tests
+          make test
