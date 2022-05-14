@@ -1,18 +1,21 @@
 import json
 
+
 def parse_json(path):
     return json.load(open(path))
 
+
 def generate_output_string(sign, key, value):
     result = f'  {sign} {key}: '
-    if value == True:
+    if value is True:
         result += 'true'
-    elif value == False:
+    elif value is False:
         result += 'false'
     else:
         result += str(value)
     result += '\n'
     return result
+
 
 def generate_diff(filepath1, filepath2, format):
     file1 = parse_json(filepath1)
