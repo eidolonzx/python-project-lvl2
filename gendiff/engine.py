@@ -1,4 +1,5 @@
-from gendiff.parsers import parse_json, parse_yaml
+from gendiff.parsers import parse_json
+from gendiff.parsers import parse_yaml
 
 
 def generate_output_string(sign, key, value):

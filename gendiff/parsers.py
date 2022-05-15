@@ -1,4 +1,5 @@
-import json, yaml
+import json
+import yaml
 
 
 def parse_json(path):
