@@ -1,8 +1,4 @@
-import json
-
-
-def parse_json(path):
-    return json.load(open(path))
+from gendiff.parsers import parse_json, parse_yaml
 
 
 def generate_output_string(sign, key, value):
@@ -18,8 +14,17 @@ def generate_output_string(sign, key, value):
 
 
 def generate_diff(filepath1, filepath2, format):
-    file1 = parse_json(filepath1)
-    file2 = parse_json(filepath2)
+    # Конвертим в словари содержание файлов в зависимости от формата
+    if format == 'json':
+        # Конвертируется в словарь
+        file1 = parse_json(filepath1)
+        file2 = parse_json(filepath2)
+    elif format == 'yaml' or format == 'yml':
+        # Конвертируется вроде тоже в словарь
+        file1 = parse_yaml(filepath1)
+        file2 = parse_yaml(filepath2)
+    else:
+        return 'Unknown format'
 
     # Получаем массив отсортированных по алфавиту уникальных ключей
     keys1 = list(file1.keys())
