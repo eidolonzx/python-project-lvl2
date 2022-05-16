@@ -2,6 +2,7 @@
 
 import argparse
 from gendiff.engine import generate_diff
+from gendiff.render import render_diff_result
 
 
 def main():
@@ -13,7 +14,8 @@ def main():
                         default='json', choices=['plain', 'text', 'json'])
     args = parser.parse_args()
     diff_list = generate_diff(args.first_file, args.second_file, args.format)
-    print(diff_list)
+    result = render_diff_result(diff_list)
+    print(result)
 
 
 if __name__ == '__main__':

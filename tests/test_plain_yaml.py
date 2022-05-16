@@ -1,4 +1,5 @@
 from gendiff.engine import generate_diff
+from gendiff.render import render_diff_result
 
 
 def test_plain_yml_comparison():
@@ -7,7 +8,7 @@ def test_plain_yml_comparison():
     result_file = open('tests/fixtures/result.txt', 'r')
     result_output = result_file.read()
 
-    assert generate_diff(filepath1, filepath2, 'yaml') == result_output
+    assert render_diff_result(generate_diff(filepath1, filepath2, 'yaml')) == result_output
 
 
 def test_plain_yaml_comparison():
@@ -16,4 +17,4 @@ def test_plain_yaml_comparison():
     result_file = open('tests/fixtures/result.txt', 'r')
     result_output = result_file.read()
 
-    assert generate_diff(filepath1, filepath2, 'yaml') == result_output
+    assert render_diff_result(generate_diff(filepath1, filepath2, 'yaml')) == result_output
