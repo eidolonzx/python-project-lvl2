@@ -4,20 +4,22 @@ def render_prefix(key, sign, step):
 
 def fix_bool_values(value):
     if isinstance(value, bool):
-        if value == True:
+        if value:
             return 'true'
-        elif value == False:
+        else:
             return 'false'
     if value is None:
-        return 'null'    
+        return 'null'
     return value
+
 
 def render_diff_result(diff_result):
     output = '{\n'
+
     def iter(dict, step):
         nonlocal output
         for i in dict:
-            if i['parent'] == True:
+            if i['parent']:
                 if i['type'] == 'unchanged' or i['type'] == 'changed':
                     sign = ' '
                     # TODO: лишняя проверка, исправить в engine.py и здесь
@@ -51,7 +53,6 @@ def render_diff_result(diff_result):
                     output += str(fix_bool_values(i['value']))
                 output += '\n'
         return
-
 
     iter(diff_result, 1)
     output += '}'

@@ -1,6 +1,7 @@
 from gendiff.parsers import parse_json
 from gendiff.parsers import parse_yaml
 
+
 # Получить список уникальных ключей, входящих в оба словаря
 def get_uniq_keys(dict1, dict2):
     keys1 = list(dict1.keys())
@@ -9,6 +10,7 @@ def get_uniq_keys(dict1, dict2):
     keys_uniq = list(set(keys))
     keys_uniq.sort()
     return keys_uniq
+
 
 def generate_diff(filepath1, filepath2, format):
     # Конвертим содержимое файлов в словарь
@@ -20,11 +22,12 @@ def generate_diff(filepath1, filepath2, format):
         file2 = parse_yaml(filepath2)
     else:
         return 'Unknown format'
-    
+
     # Получаем массив отсортированных по алфавиту уникальных ключей
     keys_uniq = get_uniq_keys(file1, file2)
 
-    # Формируем результирующий список, в котором каждый элемент - словарь свойств каждого ключа
+    # Формируем результирующий список, в котором каждый элемент
+    #  - словарь свойств каждого ключа
     return make_diff_list(file1, file2, keys_uniq, [])
 
 
@@ -36,30 +39,30 @@ def make_diff_list(dict1, dict2, keys_uniq, acc):
             # 1.1 Если в обоих ключах словари
             if type(dict1[i]) is dict and type(dict2[i]) is dict:
 
-                dict1_child = dict1[i]
-                dict2_child = dict2[i]
-                if dict1_child == dict2_child:
+                child1 = dict1[i]
+                child2 = dict2[i]
+                if child1 == child2:
                     type_of_element = 'unchanged'
                 else:
-                    type_of_element = 'changed' 
-                    
-                keys_uniq_children = get_uniq_keys(dict1_child, dict2_child)
-                children_of_element = make_diff_list(dict1_child, dict2_child, keys_uniq_children, [])
+                    type_of_element = 'changed'
+
+                uniq_keys = get_uniq_keys(child1, child2)
+                children = make_diff_list(child1, child2, uniq_keys, [])
                 acc.append({
                     'key': i,
                     'parent': True,
                     'type': type_of_element,
-                    'children': children_of_element
+                    'children': children
                 })
             # 1.2 Если в первом ключе словарь, а во втором значение
             elif type(dict1[i]) is dict:
-                dict1_child = dict1[i]
-                children_of_element = make_diff_list(dict1_child, dict1_child, dict1_child.keys(), [])
+                child1 = dict1[i]
+                children = make_diff_list(child1, child1, child1.keys(), [])
                 acc.append({
                     'key': i,
                     'parent': True,
                     'type': 'deleted',
-                    'children': children_of_element
+                    'children': children
                 })
                 acc.append({
                     'key': i,
@@ -69,8 +72,8 @@ def make_diff_list(dict1, dict2, keys_uniq, acc):
                 })
             # 1.3 Если в первом ключе значение, а во втором словарь
             elif type(dict2[i]) is dict:
-                dict2_child = dict2[i]
-                children_of_element = make_diff_list(dict2_child, dict2_child, dict2_child.keys(), [])
+                child2 = dict2[i]
+                children = make_diff_list(child2, child2, child2.keys(), [])
                 acc.append({
                     'key': i,
                     'value': dict1[i],
@@ -81,7 +84,7 @@ def make_diff_list(dict1, dict2, keys_uniq, acc):
                     'key': i,
                     'parent': True,
                     'type': 'added',
-                    'children': children_of_element
+                    'children': children
                 })
             # 1.4 Если в обоих ключах значения, и они одинаковые
             elif dict1[i] == dict2[i]:
@@ -105,13 +108,13 @@ def make_diff_list(dict1, dict2, keys_uniq, acc):
         elif i in dict1:
             # 2.1 Если в ключе словарь
             if type(dict1[i]) is dict:
-                dict1_child = dict1[i]
-                children_of_element = make_diff_list(dict1_child, dict1_child, dict1_child.keys(), [])
+                child1 = dict1[i]
+                children = make_diff_list(child1, child1, child1.keys(), [])
                 acc.append({
                     'key': i,
                     'parent': True,
                     'type': 'deleted',
-                    'children': children_of_element
+                    'children': children
                 })
             # 2.2 Если в ключе значение
             else:
@@ -125,20 +128,20 @@ def make_diff_list(dict1, dict2, keys_uniq, acc):
         else:
             # 3.1 Если в ключе словарь
             if type(dict2[i]) is dict:
-                dict2_child = dict2[i]
-                children_of_element = make_diff_list(dict2_child, dict2_child, dict2_child.keys(), [])
+                child2 = dict2[i]
+                children = make_diff_list(child2, child2, child2.keys(), [])
                 acc.append({
                     'key': i,
                     'parent': True,
                     'type': 'added',
-                    'children': children_of_element
+                    'children': children
                 })
             # 3.2 Если в ключе значение
             else:
-               acc.append({
+                acc.append({
                     'key': i,
                     'value': dict2[i],
                     'type': 'added',
                     'parent': False
-                }) 
+                })
     return acc
