@@ -1,5 +1,6 @@
 from gendiff.parsers import parse_json
 from gendiff.parsers import parse_yaml
+import os.path
 
 
 # Получить список уникальных ключей, входящих в оба словаря
@@ -13,15 +14,21 @@ def get_uniq_keys(dict1, dict2):
 
 
 def generate_diff(filepath1, filepath2, format):
+    file1_extension = os.path.splitext(filepath1)[1]
+    file2_extension = os.path.splitext(filepath2)[1]
+    print('-*-*-*-*-*-*-*-*-*-')
+    print(file1_extension)
+    if file1_extension != file2_extension:
+        raise SystemExit("ERROR 1: Can't compare files with different extensions")
     # Конвертим содержимое файлов в словарь
-    if format == 'json':
+    if file1_extension == '.json':
         file1 = parse_json(filepath1)
         file2 = parse_json(filepath2)
-    elif format == 'yaml' or format == 'yml':
+    elif file1_extension == '.yaml' or file1_extension == '.yml':
         file1 = parse_yaml(filepath1)
         file2 = parse_yaml(filepath2)
     else:
-        return 'Unknown format'
+        raise SystemExit("ERROR 2: Unknown file extensions")
 
     # Получаем массив отсортированных по алфавиту уникальных ключей
     keys_uniq = get_uniq_keys(file1, file2)
