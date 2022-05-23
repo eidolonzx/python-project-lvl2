@@ -1,0 +1,9 @@
+{
+  - common: {
+        setting1: Value 1
+    }
+  + uncommon: {
+        follow: false
+        setting1: Value 1
+    }  
+}
