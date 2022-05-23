@@ -8,5 +8,6 @@ def test_plain_render():
     result_output = result_file.read()
 
     diff_result = generate_diff(filepath1, filepath2)
-    # print(diff_result)
+    
     assert render_diff_result(diff_result, 'plain') == result_output
+    
