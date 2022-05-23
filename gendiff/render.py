@@ -1,59 +1,98 @@
-def render_prefix(key, sign, step):
-    return f'{" " * step} {sign} {key}: '
+def render_diff_result(diff_result, format='stylish'):
+    if format == 'stylish':
+        return stylish_render(diff_result)
+    elif format == 'plain':
+        return # plain_render(diff_result)
 
 
-def fix_bool_values(value):
-    if isinstance(value, bool):
-        if value:
-            return 'true'
+def stylish_render(diff, indent=2):
+    result = ['{']
+    for key, value in diff.items():
+        if value[0] == 'added':
+            add(result, key, value, indent)
+        elif value[0] == 'deleted':
+            delete(result, key, value, indent)
+        elif value[0] == 'not modified':
+            add_not_modified(result, key, value, indent)
+        elif value[0] == 'modified':
+            add_modified(result, key, value, indent)
         else:
-            return 'false'
-    if value is None:
+            add_nested_modified(result, key, value, indent)
+    result.append(' ' * (indent - 2) + '}')
+    return '\n'.join(result)
+
+
+def stylish_value(value):
+    if value == True:
+        return 'true'
+    elif value == False:
+        return 'false'
+    elif value == None:
         return 'null'
-    return value
+    else:
+        return value
 
 
-def render_diff_result(diff_result):
-    output = '{\n'
+def stylish_dict(dict_, indent):
+    result = ['{']
+    str_intent = ' ' * indent
+    for (key, value) in dict_.items():
+        if type(value) == dict:
+            result.append(
+                f'{str_intent}  {key}: {stylish_dict(value, indent + 4)}')
+        else:
+            result.append(f'{str_intent}  {key}: {stylish_value(value)}')
+    result.append(' ' * (indent - 2) + '}')
+    return '\n'.join(result)
 
-    def iter(dict, step):
-        nonlocal output
-        for i in dict:
-            if i['parent']:
-                if i['type'] == 'unchanged' or i['type'] == 'changed':
-                    sign = ' '
-                    # TODO: лишняя проверка, исправить в engine.py и здесь
-                elif i['type'] == 'added':
-                    sign = '+'
-                else:
-                    sign = '-'
 
-                output += render_prefix(i['key'], sign, step)
-                step += 4
-                output += '{\n'
-                iter(i['children'], step)
-                output += ' ' * (step - 1)
-                output += '}\n'
-                step -= 4
-            else:
-                if i['type'] == 'unchanged':
-                    output += render_prefix(i['key'], ' ', step)
-                    output += str(fix_bool_values(i['value']))
-                elif i['type'] == 'changed':
-                    output += render_prefix(i['key'], '-', step)
-                    output += str(fix_bool_values(i['old_value']))
-                    output += '\n'
-                    output += render_prefix(i['key'], '+', step)
-                    output += str(fix_bool_values(i['new_value']))
-                elif i['type'] == 'deleted':
-                    output += render_prefix(i['key'], '-', step)
-                    output += str(fix_bool_values(i['value']))
-                elif i['type'] == 'added':
-                    output += render_prefix(i['key'], '+', step)
-                    output += str(fix_bool_values(i['value']))
-                output += '\n'
-        return
+def add(result, key, value, indent):
+    str_indent = ' ' * indent
+    if type(value[1]) == dict:
+        result.append(
+            f'{str_indent}+ {key}: {stylish_dict(value[1], indent + 4)}')
+    else:
+        result.append(f'{str_indent}+ {key}: {stylish_value(value[1])}')
+    return result
 
-    iter(diff_result, 1)
-    output += '}'
-    return output
+
+def delete(result, key, value, indent):
+    str_indent = ' ' * indent
+    if type(value[1]) == dict:
+        result.append(
+            f'{str_indent}- {key}: {stylish_dict(value[1], indent + 4)}')
+    else:
+        result.append(f'{str_indent}- {key}: {stylish_value(value[1])}')
+    return result
+
+
+def add_not_modified(result, key, value, indent):
+    str_indent = ' ' * indent
+    if type(value[1]) == dict:
+        result.append(
+            f'{str_indent}  {key}: {stylish_dict(value[1], indent + 4)}')
+    else:
+        result.append(f'{str_indent}  {key}: {stylish_value(value[1])}')
+    return result
+
+
+def add_modified(result, key, value, indent):
+    str_indent = ' ' * indent
+    if type(value[1]) == dict:
+        result.append(
+            f'{str_indent}- {key}: {stylish_dict(value[1], indent + 4)}')
+    else:
+        result.append(f'{str_indent}- {key}: {stylish_value(value[1])}')
+    if type(value[2]) == dict:
+        result.append(
+            f'{str_indent}+ {key}: {stylish_dict(value[2], indent + 4)}')
+    else:
+        result.append(f'{str_indent}+ {key}: {stylish_value(value[2])}')
+    return result
+
+
+def add_nested_modified(result, key, value, indent):
+    str_indent = ' ' * indent
+    result.append(
+        f'{str_indent}  {key}: {stylish_dict(value[1], indent + 4)}')
+    return result

@@ -13,11 +13,10 @@ def get_uniq_keys(dict1, dict2):
     return keys_uniq
 
 
-def generate_diff(filepath1, filepath2, format):
+def generate_diff(filepath1, filepath2):
     file1_extension = os.path.splitext(filepath1)[1]
     file2_extension = os.path.splitext(filepath2)[1]
-    print('-*-*-*-*-*-*-*-*-*-')
-    print(file1_extension)
+
     if file1_extension != file2_extension:
         raise SystemExit("ERROR 1: Can't compare files with different extensions")
     # Конвертим содержимое файлов в словарь
@@ -31,124 +30,85 @@ def generate_diff(filepath1, filepath2, format):
         raise SystemExit("ERROR 2: Unknown file extensions")
 
     # Получаем массив отсортированных по алфавиту уникальных ключей
+    # keys_uniq = get_uniq_keys(file1, file2)
+
+    return make_diff_list(file1, file2)
+
+
+def make_diff_list(file1, file2):
     keys_uniq = get_uniq_keys(file1, file2)
-
-    # Формируем результирующий список, в котором каждый элемент
-    #  - словарь свойств каждого ключа
-    return make_diff_list(file1, file2, keys_uniq, [])
-
-
-def make_diff_list(dict1, dict2, keys_uniq, acc):
-
+    result = []
     for i in keys_uniq:
-        # 1. Если одинаковые ключи есть в обоих файлах
-        if i in dict1 and i in dict2:
-            # 1.1 Если в обоих ключах словари
-            if type(dict1[i]) is dict and type(dict2[i]) is dict:
-
-                child1 = dict1[i]
-                child2 = dict2[i]
-                if child1 == child2:
-                    type_of_element = 'unchanged'
-                else:
-                    type_of_element = 'changed'
-
-                uniq_keys = get_uniq_keys(child1, child2)
-                children = make_diff_list(child1, child2, uniq_keys, [])
-                acc.append({
+        if i not in file1:
+            # Если нет в старом, но появилось в новом
+            if type(file2[i]) == dict:
+                result.append({
                     'key': i,
-                    'parent': True,
-                    'type': type_of_element,
-                    'children': children
+                    'status': 'added',
+                    'value': make_diff_list(file2[i], file2[i])
                 })
-            # 1.2 Если в первом ключе словарь, а во втором значение
-            elif type(dict1[i]) is dict:
-                child1 = dict1[i]
-                children = make_diff_list(child1, child1, child1.keys(), [])
-                acc.append({
-                    'key': i,
-                    'parent': True,
-                    'type': 'deleted',
-                    'children': children
-                })
-                acc.append({
-                    'key': i,
-                    'value': dict2[i],
-                    'type': 'added',
-                    'parent': False
-                })
-            # 1.3 Если в первом ключе значение, а во втором словарь
-            elif type(dict2[i]) is dict:
-                child2 = dict2[i]
-                children = make_diff_list(child2, child2, child2.keys(), [])
-                acc.append({
-                    'key': i,
-                    'value': dict1[i],
-                    'type': 'deleted',
-                    'parent': False
-                })
-                acc.append({
-                    'key': i,
-                    'parent': True,
-                    'type': 'added',
-                    'children': children
-                })
-            # 1.4 Если в обоих ключах значения, и они одинаковые
-            elif dict1[i] == dict2[i]:
-                acc.append({
-                    'key': i,
-                    'value': dict1[i],
-                    'type': 'unchanged',
-                    'parent': False
-                })
-            # 1.5 Если в обоих ключах значения, и они разные
             else:
-                # type = 'changed'
-                acc.append({
+                result.append({
                     'key': i,
-                    'old_value': dict1[i],
-                    'new_value': dict2[i],
-                    'type': 'changed',
-                    'parent': False
+                    'status': 'added',
+                    'value': file2[i]
                 })
-        # 2. Если ключ есть в первом словаре, но отсутствует во втором
-        elif i in dict1:
-            # 2.1 Если в ключе словарь
-            if type(dict1[i]) is dict:
-                child1 = dict1[i]
-                children = make_diff_list(child1, child1, child1.keys(), [])
-                acc.append({
+        elif i not in file2:
+            # result[i] = ('deleted', file1[i])
+            if type(file1[i]) == dict:
+                result.append({
                     'key': i,
-                    'parent': True,
-                    'type': 'deleted',
-                    'children': children
+                    'status': 'removed',
+                    'value': make_diff_list(file1[i], file1[i])
                 })
-            # 2.2 Если в ключе значение
             else:
-                acc.append({
+                result.append({
                     'key': i,
-                    'value': dict1[i],
-                    'type': 'deleted',
-                    'parent': False
+                    'status': 'removed',
+                    'value': file1[i]
                 })
-        # 3. Если ключ есть во втором словаре, но отсутствует в первом
+        elif file1[i] == file2[i]:
+            # result[i] = ('not modified', file1[i])
+            if type(file1[i]) == dict:
+                result.append({
+                    'key': i,
+                    'status': 'not modified',
+                    'value': make_diff_list(file1[i], file2[i])
+                })
+            else:
+                result.append({
+                    'key': i,
+                    'status': 'not modified',
+                    'value': file1[i]
+                })
+        elif type(file1[i]) == dict and type(file2[i]) == dict:
+            # result[i] = ('nested modified', make_diff_list(file1[i], file2[i]))
+            result.append({
+                'key': i,
+                'status': 'parent modified',
+                'value': make_diff_list(file1[i], file2[i])
+            })
         else:
-            # 3.1 Если в ключе словарь
-            if type(dict2[i]) is dict:
-                child2 = dict2[i]
-                children = make_diff_list(child2, child2, child2.keys(), [])
-                acc.append({
+            # result[i] = ('modified', file1[i], file2[i])
+            if type(file1[i]) == dict:
+                result.append({
                     'key': i,
-                    'parent': True,
-                    'type': 'added',
-                    'children': children
+                    'status': 'modified',
+                    'value': file2[i],
+                    'old value': make_diff_list(file1[i], file1[i])
                 })
-            # 3.2 Если в ключе значение
+            elif type(file2[i]) == dict:
+                result.append({
+                    'key': i,
+                    'status': 'modified',
+                    'value': make_diff_list(file2[i], file2[i]),
+                    'old value': file1[i]
+                })
             else:
-                acc.append({
+                result.append({
                     'key': i,
-                    'value': dict2[i],
-                    'type': 'added',
-                    'parent': False
+                    'status': 'modified',
+                    'value': file2[i],
+                    'old value': file1[i]
                 })
-    return acc
+    return result
