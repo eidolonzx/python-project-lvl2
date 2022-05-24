@@ -21,11 +21,11 @@ def stylish_formatter(diff, step=2):
 
 
 def stylish_value(value):
-    if value == True:
+    if value is True:
         return 'true'
-    elif value == False:
+    elif value is False:
         return 'false'
-    elif value == None:
+    elif value is None:
         return 'null'
     else:
         return value
