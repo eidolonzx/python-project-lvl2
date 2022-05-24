@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
-from gendiff.engine import generate_diff
-from gendiff.render import render_diff_result
+from gendiff.generate_diff import generate_diff
 
 
 def main():
@@ -13,8 +12,7 @@ def main():
     parser.add_argument('-f', '--format', help='set format of output',
                         default='stylish', choices=['plain', 'stylish', 'json'])
     args = parser.parse_args()
-    diff_list = generate_diff(args.first_file, args.second_file)
-    result = render_diff_result(diff_list, args.format)
+    result = generate_diff(args.first_file, args.second_file, args.format)
     print(result)
 
 

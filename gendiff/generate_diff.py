@@ -1,5 +1,8 @@
 from gendiff.parsers import parse_json
 from gendiff.parsers import parse_yaml
+from gendiff.stylish_formatter import stylish_formatter
+from gendiff.plain_formatter import plain_formatter
+from gendiff.json_formatter import json_formatter
 import os.path
 
 
@@ -12,7 +15,7 @@ def get_uniq_keys(dict1, dict2):
     return keys_uniq
 
 
-def generate_diff(filepath1, filepath2):
+def generate_diff(filepath1, filepath2, format):
     file1_extension = os.path.splitext(filepath1)[1]
     file2_extension = os.path.splitext(filepath2)[1]
 
@@ -28,7 +31,16 @@ def generate_diff(filepath1, filepath2):
     else:
         raise SystemExit("ERR 2: Unknown file extensions")
 
-    return make_diff_list(file1, file2)
+    diff_result = make_diff_list(file1, file2)
+
+    if format == 'stylish':
+        return stylish_formatter(diff_result)
+    elif format == 'plain':
+        return plain_formatter(diff_result)
+    elif format == 'json':
+        return json_formatter(diff_result)
+    else:
+        raise SystemExit("ERR 3: Unknown format of output")
 
 
 def make_diff_list(file1, file2):  # noqa: C901
