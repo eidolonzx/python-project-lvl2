@@ -29,7 +29,7 @@ def test_engine_with_simple_files():
         }
     ]
 
-    assert generate_diff(filepath1, filepath2) == result
+    assert generate_diff(filepath1, filepath2, 'stylish') == result
 
 
 def test_engine_with_complex_files():

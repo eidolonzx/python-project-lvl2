@@ -6,30 +6,15 @@ from gendiff.json_formatter import json_formatter
 import os.path
 
 
-def get_uniq_keys(dict1, dict2):
-    keys1 = list(dict1.keys())
-    keys2 = list(dict2.keys())
-    keys = keys1 + keys2
-    keys_uniq = list(set(keys))
-    keys_uniq.sort()
-    return keys_uniq
-
-
-def generate_diff(filepath1, filepath2, format):
+def generate_diff(filepath1, filepath2, format='stylish'):
     file1_extension = os.path.splitext(filepath1)[1]
-    file2_extension = os.path.splitext(filepath2)[1]
-
-    if file1_extension != file2_extension:
-        raise SystemExit("ERR 1: Can't compare files with different extensions")
 
     if file1_extension == '.json':
         file1 = parse_json(filepath1)
         file2 = parse_json(filepath2)
-    elif file1_extension == '.yaml' or file1_extension == '.yml':
+    else:
         file1 = parse_yaml(filepath1)
         file2 = parse_yaml(filepath2)
-    else:
-        raise SystemExit("ERR 2: Unknown file extensions")
 
     diff_result = make_diff_list(file1, file2)
 
@@ -37,10 +22,17 @@ def generate_diff(filepath1, filepath2, format):
         return stylish_formatter(diff_result)
     elif format == 'plain':
         return plain_formatter(diff_result)
-    elif format == 'json':
-        return json_formatter(diff_result)
     else:
-        raise SystemExit("ERR 3: Unknown format of output")
+        return json_formatter(diff_result)
+
+
+def get_uniq_keys(dict1, dict2):
+    keys1 = list(dict1.keys())
+    keys2 = list(dict2.keys())
+    keys = keys1 + keys2
+    keys_uniq = list(set(keys))
+    keys_uniq.sort()
+    return keys_uniq
 
 
 def make_diff_list(file1, file2):  # noqa: C901
