@@ -1,4 +1,4 @@
-from gendiff.engine import generate_diff
+from gendiff.generate_diff import generate_diff
 from gendiff.render import render_diff_result
 
 def test_plain_render():

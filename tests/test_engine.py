@@ -1,4 +1,4 @@
-from gendiff.engine import generate_diff
+from gendiff.generate_diff import generate_diff
 
 
 def test_engine_with_simple_files():
