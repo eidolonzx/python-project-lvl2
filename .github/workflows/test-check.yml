@@ -1,4 +1,4 @@
-name: pytest
+name: test and test coverage check
 on: [push]
 jobs:
   test-check:
