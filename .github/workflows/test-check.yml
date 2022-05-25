@@ -1,7 +1,7 @@
 name: pytest
 on: [push]
 jobs:
-  pytest:
+  test-check:
     runs-on: ubuntu-latest 
     steps:
     - uses: actions/checkout@v3
@@ -9,9 +9,15 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
-    - name: pytest
+    - name: Install dependencies
       run: |
             pip3 install poetry
             pip3 install PyYAML
             pip3 install pytest
             poetry run pytest 
+    - name: Code coverage
+      uses: paambaati/codeclimate-action@v3.0.0
+      env:
+        CC_TEST_REPORTER_ID: 7fe7856d8ce5b36e37781840f0d7c4af692f30960d85b6cffde622bed42407c1
+      with:
+        coverageCommand: poetry run coverage run -m pytest -vv
