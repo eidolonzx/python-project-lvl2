@@ -2,5 +2,4 @@
 .vscode/
 dist/
 __pycache__
-filez1.json
-filez2.json
+coverage.xml
