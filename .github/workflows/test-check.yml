@@ -12,6 +12,7 @@ jobs:
     - name: Install dependencies
       run: |
             pip3 install poetry
+            poetry install
             pip3 install PyYAML
             pip3 install pytest
             poetry run pytest 
@@ -21,3 +22,4 @@ jobs:
         CC_TEST_REPORTER_ID: 7fe7856d8ce5b36e37781840f0d7c4af692f30960d85b6cffde622bed42407c1
       with:
         coverageCommand: poetry run pytest --cov=gendiff --cov-report xml
+        debug: true
