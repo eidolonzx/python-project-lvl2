@@ -8,6 +8,5 @@ def test_complex_json_to_plain():
     result_output = result_file.read()
 
     diff_result = generate_diff(filepath1, filepath2, 'plain')
-    
+
     assert diff_result == result_output
-    

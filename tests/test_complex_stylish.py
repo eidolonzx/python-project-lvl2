@@ -8,9 +8,9 @@ def test_complex_json_to_stylish():
     result_output = result_file.read()
 
     diff_result = generate_diff(filepath1, filepath2, 'stylish')
-    
+
     assert diff_result == result_output
-    
+
 
 def test_complex_yaml_to_stylish():
     filepath1 = 'tests/fixtures/file1_complex.yaml'
@@ -19,5 +19,5 @@ def test_complex_yaml_to_stylish():
     result_output = result_file.read()
 
     diff_result = generate_diff(filepath1, filepath2, 'stylish')
-    
+
     assert diff_result == result_output
