@@ -1,8 +1,6 @@
 def stylish_formatter(diff, step=2):
     result = ['{']
     for i in diff:
-        print('! I AM HERE !')
-        print(i)
         key = i['key']
         value = i['value']
         status = i['status']
