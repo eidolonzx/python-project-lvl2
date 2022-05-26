@@ -23,6 +23,8 @@ def plain_formatter(diff, path=''):
 def stylish_value(value):
     if type(value) == list:
         return '[complex value]'
+    if type(value) == int:
+        return value
     if value is True:
         result = 'true'
     elif value is False:
