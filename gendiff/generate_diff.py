@@ -27,11 +27,7 @@ def generate_diff(filepath1, filepath2, format='stylish'):
 
 
 def get_uniq_keys(dict1, dict2):
-    keys1 = list(dict1.keys())
-    keys2 = list(dict2.keys())
-    keys = keys1 + keys2
-    keys_uniq = list(set(keys))
-    keys_uniq.sort()
+    keys_uniq = sorted(dict1.keys() | dict2.keys())
     return keys_uniq
 
 
