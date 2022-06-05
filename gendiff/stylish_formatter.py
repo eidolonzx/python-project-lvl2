@@ -15,17 +15,6 @@ def stylish_formatter(diff, step=2):
             'modified': add_modified,
             'parent modified': add_nested_modified
         }
-        #if status == 'added':
-        #    add_added(result, key, value, step)
-        #elif status == 'removed':
-        #    add_removed(result, key, value, step)
-        #elif status == 'not modified':
-        #    add_not_modified(result, key, value, step)
-        #elif status == 'modified':
-        #    add_modified(result, key, value, i['old value'], step)
-        #else:
-        #    add_nested_modified(result, key, value, step)
-
         statuses.get(i['status'])(result, key, step, value, old_value)
     result.append(' ' * (step - 2) + '}')
     return '\n'.join(result)
