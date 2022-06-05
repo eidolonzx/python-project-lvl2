@@ -4,16 +4,29 @@ def stylish_formatter(diff, step=2):
         key = i['key']
         value = i['value']
         status = i['status']
-        if status == 'added':
-            add_added(result, key, value, step)
-        elif status == 'removed':
-            add_removed(result, key, value, step)
-        elif status == 'not modified':
-            add_not_modified(result, key, value, step)
-        elif status == 'modified':
-            add_modified(result, key, value, i['old value'], step)
+        if status == 'modified':
+            old_value = i['old value']
         else:
-            add_nested_modified(result, key, value, step)
+            old_value = None
+        statuses = {
+            'added': add_added,
+            'removed': add_removed,
+            'not modified': add_not_modified,
+            'modified': add_modified,
+            'parent modified': add_nested_modified
+        }
+        #if status == 'added':
+        #    add_added(result, key, value, step)
+        #elif status == 'removed':
+        #    add_removed(result, key, value, step)
+        #elif status == 'not modified':
+        #    add_not_modified(result, key, value, step)
+        #elif status == 'modified':
+        #    add_modified(result, key, value, i['old value'], step)
+        #else:
+        #    add_nested_modified(result, key, value, step)
+
+        statuses.get(i['status'])(result, key, step, value, old_value)
     result.append(' ' * (step - 2) + '}')
     return '\n'.join(result)
 
@@ -44,7 +57,8 @@ def stylish_dict(dict_, step):
     return '\n'.join(result)
 
 
-def add_added(result, key, value, step):
+def add_added(result, key, step, *args):
+    value = args[0]
     str_step = ' ' * step
     if type(value) == list:
         result.append(
@@ -54,7 +68,8 @@ def add_added(result, key, value, step):
     return result
 
 
-def add_removed(result, key, value, step):
+def add_removed(result, key, step, *args):
+    value = args[0]
     str_step = ' ' * step
     if type(value) == list:
         result.append(
@@ -64,7 +79,8 @@ def add_removed(result, key, value, step):
     return result
 
 
-def add_not_modified(result, key, value, step):
+def add_not_modified(result, key, step, *args):
+    value = args[0]
     str_step = ' ' * step
     if type(value) == list:
         result.append(
@@ -74,7 +90,9 @@ def add_not_modified(result, key, value, step):
     return result
 
 
-def add_modified(result, key, value, old_value, step):
+def add_modified(result, key, step, *args):
+    value = args[0]
+    old_value = args[1]
     str_step = ' ' * step
     if type(old_value) == list:
         result.append(
@@ -89,7 +107,8 @@ def add_modified(result, key, value, old_value, step):
     return result
 
 
-def add_nested_modified(result, key, value, step):
+def add_nested_modified(result, key, step, *args):
+    value = args[0]
     str_step = ' ' * step
     result.append(
         f'{str_step}  {key}: {stylish_formatter(value, step + 4)}')
